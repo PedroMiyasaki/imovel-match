@@ -1,5 +1,5 @@
 # Imóveis AI Agent 🏠🤖
-An intelligent real estate assistant built with LangChain that simulates a "corretor de imóveis" (real estate agent) to help users find their ideal properties in Brazil.
+An intelligent real estate assistant built with Pydantic AI that simulates a "corretor de imóveis" (real estate agent) to help users find their ideal properties in Brazil.
 
 ## 🎯 Purpose
 This AI-powered agent streamlines the property search process by guiding users through their preferences and requirements, making property hunting more efficient and personalized. It serves as a virtual real estate agent, helping users discover properties that match their specific criteria.
@@ -18,7 +18,7 @@ This AI-powered agent streamlines the property search process by guiding users t
 
 ## 🛠️ Technologies
 
-- LangChain
+- Pydantic AI
 - Python
 - [Other technologies you plan to use]
 
@@ -37,4 +37,4 @@ Contributions are welcome! Feel free to:
 
 ## 📝 License
 
-[Your chosen license]
+MIT License
