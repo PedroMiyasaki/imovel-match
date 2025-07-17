@@ -1,7 +1,6 @@
 [project]
 name = "imovel-match"
 version = "0.1.0"
-description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -12,4 +11,21 @@ dependencies = [
     "pydantic>=2.11.7",
     "pydantic-ai>=0.4.0",
     "tabulate>=0.9.0",
+    "pyyaml>=6.0.1",
+    "rich>=13.7.1",
+    "pytz>=2025.2",
+    "ruff>=0.12.3",
+    "mlflow>=3.1.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
 ]
+
+[tool.mypy]
+python_version = "3.11"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.ruff]
+target-version = "py311"
+line-length     = 88
+select          = ["E", "F", "B", "I"]
