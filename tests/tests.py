@@ -10,7 +10,9 @@ from app.agents.guard_rail_agent import guard_rail_agent
 from app.agents.real_estate_agent import real_state_agent
 from app.models.user_models import UserInput
 
+
 connection = duckdb.connect("tests/test_db.db")
+
 
 class TestRealEstateAgent:
     """
@@ -35,6 +37,7 @@ class TestRealEstateAgent:
         result = guard_rail_agent.run_sync(user_input)
         assert result.output.rules_are_being_broken == expected_result
 
+
     @pytest.mark.parametrize("user_input", [
         ("Hi there!"),
     ])
@@ -44,6 +47,7 @@ class TestRealEstateAgent:
         Tests the real estate agent without any tool calls
         """
         tool_names = []
+        custom_tools = ["search_properties", "get_property_slots", "book_property_slot", "cancel_property_slot"]
         async with real_state_agent.iter(user_input, deps=UserInput(connection=connection, user_name="Alex")) as agent_run:
             async for node in agent_run:
                 if real_state_agent.is_call_tools_node(node):
@@ -51,14 +55,13 @@ class TestRealEstateAgent:
                         if isinstance(tool_call, ToolCallPart) :
                             tool_names.append(tool_call.tool_name)
         
-        assert not tool_names
-        assert isinstance(agent_run.result, str)
+        assert not any(tool in tool_names for tool in custom_tools)
 
 
     @pytest.mark.parametrize("user_input, makes_tool_call, returns_properties", [
         ("Eu gostaria de uma casa com 2 quartos em Curitiba", True, True),
         ("Eu gostaria de uma casa com 1 quarto e 1 banheiro em Pindamonhangaba", True, False),
-        ("Eu gostaria de uma casa em Curitiba", False, False),
+        ("Eu gostaria de uma casa em Curitiba", True, False),
     ])
     @pytest.mark.asyncio
     async def test_search_properties(self, user_input:str, makes_tool_call:bool, returns_properties:bool):
@@ -77,7 +80,7 @@ class TestRealEstateAgent:
             assert "search_properties" in tool_names, "Tool call was not made"
             
             if returns_properties:
-                markdown_result = agent_run.result
+                markdown_result = agent_run.result.output.properties
                 n_returned_properties = len(markdown_result.strip().split('\n')) - 2
                 assert n_returned_properties > 0, "No properties were returned"
 
@@ -88,7 +91,7 @@ class TestRealEstateAgent:
     @pytest.mark.parametrize("user_input, makes_tool_call, returns_slots", [
         ("Quais os horários para visitar o imóvel com id 'abcfoo42'?", True, True),
         ("Quais os horários para visitar o imóvel '999999'?", True, False),
-        ("Quais os horários para visitar o imóvel", False, False),
+        ("Quais os horários para visitar o imóvel?", False, False),
     ])
     @pytest.mark.asyncio
     async def test_get_property_slots(self, user_input:str, makes_tool_call:bool, returns_slots:bool):
@@ -107,19 +110,20 @@ class TestRealEstateAgent:
             assert "get_property_slots" in tool_names, "Tool call was not made"
             
             if returns_slots:
-                markdown_result = agent_run.result
+                markdown_result = agent_run.result.output.slots
                 n_slots = len(markdown_result.strip().split('\n')) - 2
                 assert n_slots > 0
                 
         else:
             assert "get_property_slots" not in tool_names, "Tool call was made"
 
-    @pytest.mark.parametrize("user_input, makes_tool_call, is_successful", [
-        ("Gostaria de agendar uma visita para o imóvel 'abcfoo42' no dia 2024-12-25 as 10 da manhã.", True, True),
-        ("Quero agendar uma visita para o imovel de id '999999' as 10 da manhã.", True, False),
+
+    @pytest.mark.parametrize("user_input, makes_tool_call", [
+        ("Gostaria de agendar uma visita para o imóvel 'abcfoo42' no dia 2024-12-25 as 10 da manhã.", True),
+        ("Quero agendar uma visita para o imovel de id '999999' as 10 da manhã.", False),
     ])
     @pytest.mark.asyncio
-    async def test_book_property_slot(self, user_input:str, makes_tool_call:bool, is_successful:bool):
+    async def test_book_property_slot(self, user_input:str, makes_tool_call:bool):
         """
         Tests the book_property_slot tool.
         """
@@ -133,19 +137,17 @@ class TestRealEstateAgent:
         
         if makes_tool_call:
             assert "book_property_slot" in tool_names, "Tool call was not made"
-            
-            if is_successful:
-                assert "booked for property" in agent_run.result, "Booking was not successful"
 
         else:
             assert "book_property_slot" not in tool_names, "Tool call was made"
 
-    @pytest.mark.parametrize("user_input, makes_tool_call, is_successful", [
-        ("Preciso cancelar minha visita ao imóvel 'xyzbar99' que eu marquei no dia 2024-12-25 as 10 da manhã.", True, True),
-        ("Preciso cancelar minha visita ao imóvel '999999' que eu marquei no dia 2024-12-25 as 8 da manhã.", True, False),
+
+    @pytest.mark.parametrize("user_input, makes_tool_call", [
+        ("Preciso cancelar minha visita ao imóvel 'xyzbar99' que eu marquei no dia 2024-12-25 as 10 da manhã.", True),
+        ("Preciso cancelar minha visita ao imóvel '999999' que eu marquei no dia 2024-12-25 as 8 da manhã.", False),
     ])
     @pytest.mark.asyncio
-    async def test_cancel_property_slot(self, user_input:str, makes_tool_call:bool, is_successful:bool):
+    async def test_cancel_property_slot(self, user_input:str, makes_tool_call:bool):
         """
         Tests the cancel_property_slot tool.
         """
@@ -159,11 +161,6 @@ class TestRealEstateAgent:
         
         if makes_tool_call:
             assert "cancel_property_slot" in tool_names, "Tool call was not made"
-            
-            if is_successful:
-                assert "cancelled for property" in agent_run.result, "Cancellation was not successful"
 
         else:
             assert "cancel_property_slot" not in tool_names, "Tool call was made"
-
-

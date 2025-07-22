@@ -1,1 +1,6 @@
 database: "db/db.duckdb"
+test_database: "tests/test_db.duckdb"
+
+telegram:
+  bot_token: "7574151031:AAEtQHZpdwrbvnLE8hA9_eXyB_cj4nKKnIg"
+  chat_id: "-4744333013"

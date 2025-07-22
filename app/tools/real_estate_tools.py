@@ -1,7 +1,7 @@
 from pydantic_ai import RunContext, ModelRetry
 from app.models.user_models import UserInput
 from app.agents.real_estate_agent import real_state_agent
-from app.utils.general import check_if_property_exists
+from app.utils.general import check_if_property_exists, check_if_slot_exists
 
 @real_state_agent.tool(retries=3)
 async def search_properties(
@@ -18,7 +18,8 @@ async def search_properties(
     cidade: str = None,
 ) -> str:
     """
-    Searches for properties in the database based on the provided filters.
+    Use this tool to search for real estate properties based on user-provided criteria.
+    All parameters are optional. The more criteria provided, the more specific the search.
 
     Args:
         preco_min: Minimum price of the property.
@@ -91,13 +92,13 @@ async def search_properties(
 @real_state_agent.tool(retries=3)
 async def get_property_slots(ctx: RunContext[UserInput], property_id: str) -> str:
     """
-    Gets the slots for a property.
+    Use this tool to get the available time slots for visiting a specific property.
 
     Args:
-        property_id: The ID of the property.
+        property_id: The unique identifier of the property.
     
     Returns:
-        True if the property_id exists in the property_slots table, False otherwise.
+        A markdown table with the available slots for the given property.
     """
     if not await check_if_property_exists(ctx.deps.connection, property_id):
         raise ModelRetry(
@@ -113,20 +114,27 @@ async def get_property_slots(ctx: RunContext[UserInput], property_id: str) -> st
 @real_state_agent.tool(retries=3)
 async def book_property_slot(ctx: RunContext[UserInput], property_id: str, slot_start: str) -> str:
     """
-    Books a slot for a property.
+    Use this tool to book a visit to a specific property at a given time.
 
     Args:
-        property_id: The ID of the property.
-        slot_start: The start time of the slot.
+        property_id: The unique identifier of the property to book.
+        slot_start: The desired start time for the visit, in 'YYYY-MM-DD HH:MM:SS' format.
 
     Returns:
-        A message confirming the booking, or an error message if the slot is already booked.
+        A confirmation message if the booking is successful.
     """
     if not await check_if_property_exists(ctx.deps.connection, property_id):
         raise ModelRetry(
             (
                 f"Property id not found in the database. ID: {property_id}",
                 "Check the `property_id` and try again."
+            )
+        )
+    if not await check_if_slot_exists(ctx.deps.connection, property_id, slot_start):
+        raise ModelRetry(
+            (
+                f"Slot {slot_start} is not available for property {property_id}",
+                "Check the `slot_start` and try again."
             )
         )
 
@@ -136,20 +144,27 @@ async def book_property_slot(ctx: RunContext[UserInput], property_id: str, slot_
 @real_state_agent.tool(retries=3)
 async def cancel_property_slot(ctx: RunContext[UserInput], property_id: str, slot_start: str) -> str:
     """
-    Cancels a slot for a property.
+    Use this tool to cancel a previously booked visit to a property.
 
     Args:
-        property_id: The ID of the property.
-        slot_start: The start time of the slot.
+        property_id: The unique identifier of the property for the visit to be canceled.
+        slot_start: The start time of the visit to be canceled, in 'YYYY-MM-DD HH:MM:SS' format.
 
     Returns:
-        A message confirming the cancellation, or an error message if the slot is not booked.
+        A confirmation message if the cancellation is successful.
     """
     if not await check_if_property_exists(ctx.deps.connection, property_id):
         raise ModelRetry(
             (
                 f"Property id not found in the database. ID: {property_id}",
                 "Check the `property_id` and try again."
+            )
+        )
+    if not await check_if_slot_exists(ctx.deps.connection, property_id, slot_start):
+        raise ModelRetry(
+            (
+                f"Slot {slot_start} is not available for property {property_id}",
+                "Check the `slot_start` and try again."
             )
         )
         

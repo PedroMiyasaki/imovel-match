@@ -884,16 +884,21 @@ dependencies = [
     { name = "ipykernel" },
     { name = "mlflow" },
     { name = "numpy" },
+    { name = "packaging" },
     { name = "pandas" },
+    { name = "protobuf" },
     { name = "pydantic" },
     { name = "pydantic-ai" },
+    { name = "pydantic-core" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+    { name = "python-telegram-bot" },
     { name = "pytz" },
     { name = "pyyaml" },
     { name = "rich" },
     { name = "ruff" },
     { name = "tabulate" },
+    { name = "typing-extensions" },
 ]
 
 [package.metadata]
@@ -902,16 +907,21 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "mlflow", specifier = ">=3.1.1" },
     { name = "numpy", specifier = ">=2.3.1" },
+    { name = "packaging" },
     { name = "pandas", specifier = ">=2.3.1" },
+    { name = "protobuf", specifier = ">=5.27.2" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-ai", specifier = ">=0.4.0" },
+    { name = "pydantic-core" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
+    { name = "python-telegram-bot", specifier = ">=21.4.0" },
     { name = "pytz", specifier = ">=2025.2" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "rich", specifier = ">=13.7.1" },
     { name = "ruff", specifier = ">=0.12.3" },
     { name = "tabulate", specifier = ">=0.9.0" },
+    { name = "typing-extensions" },
 ]
 
 [[package]]
@@ -2165,6 +2175,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f3/87/f44d7c9f274c7ee665a29b885ec97089ec5dc034c7f3fafa03da9e39a09e/python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13", size = 37158, upload-time = "2024-12-16T19:45:46.972Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/45/58/38b5afbc1a800eeea951b9285d3912613f2603bdf897a4ab0f4bd7f405fc/python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104", size = 24546, upload-time = "2024-12-16T19:45:44.423Z" },
+]
+
+[[package]]
+name = "python-telegram-bot"
+version = "22.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/db/fc/0196e0d7ad247011a560788db204e0a28d76ab75b3d7c7131878f8fb5a06/python_telegram_bot-22.3.tar.gz", hash = "sha256:513d5ab9db96dcf25272dad0a726555e80edf60d09246a7d0d425b77115f5440", size = 1464513, upload-time = "2025-07-20T20:03:09.805Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/54/0955bd46a1e046169500e129c7883664b6675d580074d68823485e4d5de1/python_telegram_bot-22.3-py3-none-any.whl", hash = "sha256:88fab2d1652dbfd5379552e8b904d86173c524fdb9270d3a8685f599ffe0299f", size = 717115, upload-time = "2025-07-20T20:03:07.261Z" },
 ]
 
 [[package]]

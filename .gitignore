@@ -160,6 +160,7 @@ db/create.py
 db/imovel_match.db
 db/credentials.py
 tests/test_db.db
+tests/test_db.duckdb
 
 # Custom
 mlruns
