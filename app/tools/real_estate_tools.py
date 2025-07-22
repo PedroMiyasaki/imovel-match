@@ -78,14 +78,11 @@ async def search_properties(
 
     if df.empty:
         raise ModelRetry(
-            (
-                "No properties found for the given filters.",
-                "Please try again with less specific filters.\n",
-                "But if you are looking for a specific property using almost all parameters, review parameters values.\n\n",
-                "IMPORTANT: If you are ussing the `rua` parameter to find a specific property, review the value used.\n"
-                "Rua names tend to have lexical variations, so try ussing a different value for this parameter."
-            )
-        )
+"""No properties found for the given filters.
+Please try again with less specific filters.
+But if you are looking for a specific property using almost all parameters, review parameters values.
+IMPORTANT: If you are ussing the `rua` parameter to find a specific property, review the value used.
+Rua names tend to have lexical variations, so try ussing a different value for this parameter.""")
     
     return df.to_markdown(index=False)
 
@@ -102,10 +99,8 @@ async def get_property_slots(ctx: RunContext[UserInput], property_id: str) -> st
     """
     if not await check_if_property_exists(ctx.deps.connection, property_id):
         raise ModelRetry(
-            (
-                f"Property id not found in the database. ID: {property_id}",
-                "Check the `property_id` and try again."
-            )
+            f"""Property id not found in the database. ID: {property_id}
+Check the `property_id` and try again."""
         )
 
     df = ctx.deps.connection.execute(f"SELECT * FROM property_slots WHERE property_id = '{property_id}' AND status = 'free'").fetch_df()
@@ -125,17 +120,13 @@ async def book_property_slot(ctx: RunContext[UserInput], property_id: str, slot_
     """
     if not await check_if_property_exists(ctx.deps.connection, property_id):
         raise ModelRetry(
-            (
-                f"Property id not found in the database. ID: {property_id}",
-                "Check the `property_id` and try again."
-            )
+            f"""Property id not found in the database. ID: {property_id}
+Check the `property_id` and try again."""
         )
     if not await check_if_slot_exists(ctx.deps.connection, property_id, slot_start):
         raise ModelRetry(
-            (
-                f"Slot {slot_start} is not available for property {property_id}",
-                "Check the `slot_start` and try again."
-            )
+            f"""Slot {slot_start} is not available for property {property_id}
+Check the `slot_start` and try again."""
         )
 
     ctx.deps.connection.execute(f"UPDATE property_slots SET status = 'booked' WHERE property_id = '{property_id}' AND slot_start = '{slot_start}'")
@@ -155,17 +146,13 @@ async def cancel_property_slot(ctx: RunContext[UserInput], property_id: str, slo
     """
     if not await check_if_property_exists(ctx.deps.connection, property_id):
         raise ModelRetry(
-            (
-                f"Property id not found in the database. ID: {property_id}",
-                "Check the `property_id` and try again."
-            )
+            f"""Property id not found in the database. ID: {property_id}
+Check the `property_id` and try again."""
         )
     if not await check_if_slot_exists(ctx.deps.connection, property_id, slot_start):
         raise ModelRetry(
-            (
-                f"Slot {slot_start} is not available for property {property_id}",
-                "Check the `slot_start` and try again."
-            )
+            f"""Slot {slot_start} is not available for property {property_id}
+Check the `slot_start` and try again."""
         )
         
     ctx.deps.connection.execute(f"UPDATE property_slots SET status = 'free' WHERE property_id = '{property_id}' AND slot_start = '{slot_start}'")
