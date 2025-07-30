@@ -2,6 +2,7 @@ from pydantic_ai import RunContext, ModelRetry
 from app.models.user_models import UserInput
 from app.agents.real_estate_agent import real_state_agent
 from app.utils.general import check_if_property_exists, check_if_slot_exists
+from unidecode import unidecode
 
 @real_state_agent.tool(retries=3)
 async def search_properties(
@@ -22,16 +23,16 @@ async def search_properties(
     All parameters are optional. The more criteria provided, the more specific the search.
 
     Args:
-        preco_min: Minimum price of the property.
-        preco_max: Maximum price of the property.
-        tamanho_min: Minimum size of the property.
-        tamanho_max: Maximum size of the property.
-        n_quartos: Number of bedrooms.
-        n_banheiros: Number of bathrooms.
-        n_garagem: Number of garage spaces.
-        rua: Street name (partial match).
-        bairro: Neighborhood name (partial match).
-        cidade: City name (partial match).
+        preco_min (float): Minimum price of the property.
+        preco_max (float): Maximum price of the property.
+        tamanho_min (float): Minimum size of the property.
+        tamanho_max (float): Maximum size of the property.
+        n_quartos (int): Number of bedrooms.
+        n_banheiros (int): Number of bathrooms.
+        n_garagem (int): Number of garage spaces.
+        rua (str): Street name (partial match).
+        bairro (str): Neighborhood name (partial match).
+        cidade (str): City name (partial match).
 
     Returns:
         A markdown table with the properties found, or an empty table if no properties match.
@@ -39,6 +40,13 @@ async def search_properties(
     base_query = "SELECT property_id, preco, tamanho, cidade, bairro, rua, n_quartos, n_banheiros, n_garagem FROM properties"
     filters = []
     params = {}
+
+    if rua is not None:
+        rua = unidecode(rua)
+    if bairro is not None:
+        bairro = unidecode(bairro)
+    if cidade is not None:
+        cidade = unidecode(cidade)
 
     if preco_min is not None:
         filters.append(f"preco >= {preco_min}")
@@ -92,7 +100,7 @@ async def get_property_slots(ctx: RunContext[UserInput], property_id: str) -> st
     Use this tool to get the available time slots for visiting a specific property.
 
     Args:
-        property_id: The unique identifier of the property.
+        property_id (str): The unique identifier of the property.
     
     Returns:
         A markdown table with the available slots for the given property.
@@ -104,6 +112,7 @@ Check the `property_id` and try again."""
         )
 
     df = ctx.deps.connection.execute(f"SELECT * FROM property_slots WHERE property_id = '{property_id}' AND status = 'free'").fetch_df()
+    df = df.sort_values(by="slot_start").head(10)
     return df.to_markdown(index=False)
 
 @real_state_agent.tool(retries=3)
@@ -112,8 +121,8 @@ async def book_property_slot(ctx: RunContext[UserInput], property_id: str, slot_
     Use this tool to book a visit to a specific property at a given time.
 
     Args:
-        property_id: The unique identifier of the property to book.
-        slot_start: The desired start time for the visit, in 'YYYY-MM-DD HH:MM:SS' format.
+        property_id (str): The unique identifier of the property to book.
+        slot_start (str): The desired start time for the visit, in 'YYYY-MM-DD HH:MM:SS' format.
 
     Returns:
         A confirmation message if the booking is successful.
@@ -138,8 +147,8 @@ async def cancel_property_slot(ctx: RunContext[UserInput], property_id: str, slo
     Use this tool to cancel a previously booked visit to a property.
 
     Args:
-        property_id: The unique identifier of the property for the visit to be canceled.
-        slot_start: The start time of the visit to be canceled, in 'YYYY-MM-DD HH:MM:SS' format.
+        property_id (str): The unique identifier of the property for the visit to be canceled.
+        slot_start (str): The start time of the visit to be canceled, in 'YYYY-MM-DD HH:MM:SS' format.
 
     Returns:
         A confirmation message if the cancellation is successful.

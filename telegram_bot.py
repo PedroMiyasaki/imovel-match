@@ -38,20 +38,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action='typing')
 
-    agent_response = context.user_data.get("agent_response")
+    message_history = context.user_data.get("message_history", [])
     
     try:
-        guard_rail_response = await guard_rail_agent.run(user_input, message_history=agent_response.new_messages() if agent_response else None)
-        if guard_rail_response.output.rules_are_being_broken:
+        guard_rail_response = await guard_rail_agent.ainvoke({"input": user_input, "history": message_history})
+        if guard_rail_response.rules_are_being_broken:
             await update.message.reply_text("Desculpe, só posso ajudar com questões relacionadas a imóveis.")
             return
             
         agent_run = await real_state_agent.run(
             user_input, 
             deps=UserInput(connection=context.bot_data["db_connection"], user_name=user_name), 
-            message_history=agent_response.new_messages() if agent_response else None
+            message_history=message_history
         )
-        context.user_data["agent_response"] = agent_run
+        message_history.extend(agent_run.new_messages())
+        context.user_data["message_history"] = message_history
 
         output: RealStateAgentOutput = agent_run.output
         

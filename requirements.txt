@@ -1,0 +1,13 @@
+python-dotenv
+pydantic-ai
+duckdb
+unidecode
+pandas
+uv
+mlflow
+telegram
+python-telegram-bot
+langchain
+langchain-groq
+langchain-core
+jsonpatch 

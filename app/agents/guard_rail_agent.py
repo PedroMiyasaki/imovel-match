@@ -1,20 +1,15 @@
-from pydantic_ai import Agent
-from dotenv import load_dotenv
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
 from app.prompts.guard_rail_prompts import system_prompt
 from app.models.guard_rail_models import GuardRailAgentOutput
 
 
-load_dotenv()
-
-
-guard_rail_agent = Agent(
-    "groq:llama-3.3-70b-versatile",
-    deps_type=str,
-    system_prompt=system_prompt,
-    output_type=GuardRailAgentOutput,
-    model_settings={
-        "temperature": 0,
-        "max_tokens": 100,
-        "timeout": 60,
-    }
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system_prompt),
+    ]
 )
+model = ChatGroq(model="llama3-70b-8192", temperature=0).with_structured_output(GuardRailAgentOutput)
+
+
+guard_rail_agent = prompt | model
