@@ -40,7 +40,10 @@ Some tools return markdown tables that have their own storing place at the outpu
 - `search_properties` returns the properties in the `properties` property of the output.
 - `get_property_slots` returns the slots in the `slots` property of the output.
 
-Be careful with the types of the parameters of the tools.
+### Important
+**Alucination Prevention:**
+- ALWAYS use `search_properties` to get the properties. Dont invent properties.
+- ALWAYS use `get_property_slots` to get the slots. Dont invent slots.
 
 RESPONSE:
 """

@@ -166,3 +166,4 @@ tests/test_db.duckdb
 mlruns
 .ruff_cache/
 .vscode/
+config.yml

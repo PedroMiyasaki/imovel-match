@@ -9,12 +9,11 @@ load_dotenv()
 
 
 real_state_agent = Agent(
-    "groq:llama-3.3-70b-versatile",
+    "openai:o4-mini-2025-04-16",
     deps_type=UserInput,
     system_prompt=system_prompt,
     output_type=RealStateAgentOutput,
     model_settings={
-        "temperature": 0.1,
         "timeout": 60,
     }
 )

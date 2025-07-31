@@ -55,9 +55,9 @@ async def main(user_name: str = "Pedro", execution_mode: str = "default", use_gu
                 async with real_state_agent.iter(user_input, deps=UserInput(connection=connection, user_name=user_name), message_history=message_history) as agent_run:
                     async for node in agent_run:
                         if real_state_agent.is_call_tools_node(node):
-                            print("Agent is making a tool call:")
                             for tool_call in node.model_response.parts:
                                 if isinstance(tool_call, ToolCallPart) and tool_call.tool_name != "final_result":
+                                    print("Agent is making a tool call:")
                                     print(f"  - Tool: {tool_call.tool_name}")
                                     print(f"    Args: {tool_call.args}")
                 
@@ -80,7 +80,7 @@ async def main(user_name: str = "Pedro", execution_mode: str = "default", use_gu
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main(execution_mode="debug", use_guard_rail=False))
+        asyncio.run(main(use_guard_rail=True))
 
     except KeyboardInterrupt:
         print("\nExiting chat. Goodbye!")

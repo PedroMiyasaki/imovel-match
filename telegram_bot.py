@@ -61,13 +61,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if output.response:
             message_parts.append(escape_markdown_v2(output.response))
 
-        if output.properties:
+        if output.properties and output.properties != context.user_data.get("last_shown_properties"):
             message_parts.append("\n\n*Imóveis encontrados:*\n")
             message_parts.append(f"```\n{output.properties}\n```")
+            context.user_data["last_shown_properties"] = output.properties
 
-        if output.slots:
+        if output.slots and output.slots != context.user_data.get("last_shown_slots"):
             message_parts.append("\n\n*Horários disponíveis:*\n")
             message_parts.append(f"```\n{output.slots}\n```")
+            context.user_data["last_shown_slots"] = output.slots
             
         final_message = "".join(message_parts).strip()
 

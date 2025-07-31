@@ -83,7 +83,7 @@ async def search_properties(
         base_query += " WHERE " + " AND ".join(filters)
 
     df = ctx.deps.connection.execute(base_query).fetch_df()
-
+    
     if df.empty:
         raise ModelRetry(
 """No properties found for the given filters.
@@ -91,8 +91,21 @@ Please try again with less specific filters.
 But if you are looking for a specific property using almost all parameters, review parameters values.
 IMPORTANT: If you are ussing the `rua` parameter to find a specific property, review the value used.
 Rua names tend to have lexical variations, so try ussing a different value for this parameter.""")
+
+    properties_str = ""
+    for _, row in df.iterrows():
+        properties_str += f"ID: {row['property_id']}\\n"
+        properties_str += f"Preço: R$ {row['preco']}\\n"
+        properties_str += f"Tamanho: {row['tamanho']} m²\\n"
+        properties_str += f"Cidade: {row['cidade']}\\n"
+        properties_str += f"Bairro: {row['bairro']}\\n"
+        properties_str += f"Rua: {row['rua']}\\n"
+        properties_str += f"Quartos: {row['n_quartos']}\\n"
+        properties_str += f"Banheiros: {row['n_banheiros']}\\n"
+        properties_str += f"Vagas: {row['n_garagem']}\\n"
+        properties_str += "-" * 20 + "\\n"
     
-    return df.to_markdown(index=False)
+    return properties_str.strip()
 
 @real_state_agent.tool(retries=3)
 async def get_property_slots(ctx: RunContext[UserInput], property_id: str) -> str:
@@ -113,7 +126,14 @@ Check the `property_id` and try again."""
 
     df = ctx.deps.connection.execute(f"SELECT * FROM property_slots WHERE property_id = '{property_id}' AND status = 'free'").fetch_df()
     df = df.sort_values(by="slot_start").head(10)
-    return df.to_markdown(index=False)
+
+    slots_str = ""
+    for _, row in df.iterrows():
+        slots_str += f"Início: {row['slot_start']}\\n"
+        slots_str += f"Fim: {row['slot_end']}\\n"
+        slots_str += "-" * 20 + "\\n"
+        
+    return slots_str.strip()
 
 @real_state_agent.tool(retries=3)
 async def book_property_slot(ctx: RunContext[UserInput], property_id: str, slot_start: str) -> str:
